@@ -10,6 +10,8 @@ import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
 
 import Blank from "./pages/Blank";
+import Gallery from "./pages/Gallery";
+import Others from "./pages/Others/others";
 
 function App() {
   return (
@@ -24,39 +26,29 @@ function App() {
         />
         <Route
           exact
-          path="/books"
+          path="/others"
+          element={<PrivateRoute component={<Others />} />}
+        />
+        <Route
+          exact
+          path="/educations"
           element={<PrivateRoute component={<Blank />} />}
         />
         <Route
           exact
-          path="/orders"
+          path="/music"
           element={<PrivateRoute component={<Blank />} />}
         />
         <Route
           exact
-          path="/categories"
+          path="/movie"
           element={<PrivateRoute component={<Blank />} />}
         />
         <Route
           exact
-          path="/products"
+          path="/song"
           element={<PrivateRoute component={<Blank />} />}
-        />
-        <Route
-          exact
-          path="/report-orders"
-          element={<PrivateRoute component={<Blank />} />}
-        />
-        <Route
-          exact
-          path="/summary"
-          element={<PrivateRoute component={<Blank />} />}
-        />
-        <Route
-          exact
-          path="/product-sales-report"
-          element={<PrivateRoute component={<Blank />} />}
-        />
+        />                
         <Route
           exact
           path="/profile"
@@ -64,13 +56,8 @@ function App() {
         />
         <Route
           exact
-          path="/membership"
-          element={<PrivateRoute component={<Blank />} />}
-        />
-        <Route
-          exact
           path="/gallery"
-          element={<PrivateRoute component={<Blank />} />}
+          element={<PrivateRoute component={<Gallery />} />}
         />
       </Routes>
     </div>

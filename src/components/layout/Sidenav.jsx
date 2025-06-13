@@ -89,28 +89,27 @@ function Sidenav({ color }) {
       ),
     },
     {
-      key: "/books",
+      key: "7",
+      label: "Hiburan",
+      className: "menu-item-header",
+    },
+    {
+      key: "/others",
       label: (
-        <NavLink to="/books">
+        <NavLink to="/others">
           <span
             className="icon"
             style={{
-              backgroundColor: selectedKey === "books" ? "#f0f2f5" : "",
+              backgroundColor: selectedKey === "others" ? "#f0f2f5" : "",
             }}
           >
             {dashboard}
           </span>
-          <span className="label">Books</span>
+          <span className="label">Lainnya</span>
         </NavLink>
       ),
     },
     {
-      key: "7",
-      label: "Extra",
-      className: "menu-item-header",
-    },
-    {
-      key: "/gallery",
       label: (
         <NavLink to="/gallery">
           <span
@@ -125,110 +124,63 @@ function Sidenav({ color }) {
         </NavLink>
       ),
     },
-    {
-      key: "4",
-      label: "Store",
-      className: "menu-item-header",
-    },
-    {
-      key: "/orders",
+        {
       label: (
-        <NavLink to="/orders">
+        <NavLink to="/movie">
           <span
             className="icon"
             style={{
-              backgroundColor: selectedKey === "orders" ? "#f0f2f5" : "",
+              backgroundColor: selectedKey === "movie" ? "#f0f2f5" : "",
             }}
           >
-            <ShoppingCartOutlined />
+            <FileImageOutlined />
           </span>
-          <span className="label">Orders</span>
+          <span className="label">Movie</span>
         </NavLink>
       ),
     },
-    {
-      key: "/categories",
+        {
       label: (
-        <NavLink to="/categories">
+        <NavLink to="/educations">
           <span
             className="icon"
             style={{
-              backgroundColor: selectedKey === "categories" ? "#f0f2f5" : "",
+              backgroundColor: selectedKey === "educations" ? "#f0f2f5" : "",
             }}
           >
-            <UnorderedListOutlined />
+            <FileImageOutlined />
           </span>
-          <span className="label">Categories</span>
+          <span className="label">Educations</span>
         </NavLink>
       ),
     },
-    {
-      key: "/products",
+        {
       label: (
-        <NavLink to="/products">
+        <NavLink to="/music">
           <span
             className="icon"
             style={{
-              backgroundColor: selectedKey === "products" ? "#f0f2f5" : "",
+              backgroundColor: selectedKey === "music" ? "#f0f2f5" : "",
             }}
           >
-            <ProductOutlined />
+            <FileImageOutlined />
           </span>
-          <span className="label">Products</span>
+          <span className="label">Music</span>
         </NavLink>
       ),
     },
-    {
-      key: "5",
-      label: "Reports",
-      className: "menu-item-header",
-    },
-    {
-      key: "/report-orders",
+        {
       label: (
-        <NavLink to="/report-orders">
+        <NavLink to="/song">
           <span
             className="icon"
             style={{
-              backgroundColor: selectedKey === "report-orders" ? "#f0f2f5" : "",
+              backgroundColor: selectedKey === "song" ? "#f0f2f5" : "",
             }}
           >
-            <FundOutlined />
+            <FileImageOutlined />
           </span>
-          <span className="label">Report Orders</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/summary",
-      label: (
-        <NavLink to="/summary">
-          <span
-            className="icon"
-            style={{
-              backgroundColor: selectedKey === "summary" ? "#f0f2f5" : "",
-            }}
-          >
-            <PieChartOutlined />
-          </span>
-          <span className="label">Summary Report</span>
-        </NavLink>
-      ),
-    },
-    {
-      key: "/product-sales-report",
-      label: (
-        <NavLink to="/product-sales-report">
-          <span
-            className="icon"
-            style={{
-              backgroundColor:
-                selectedKey === "product-sales-report" ? "#f0f2f5" : "",
-            }}
-          >
-            <DollarOutlined />
-          </span>
-          <span className="label">Product Sales Report</span>
+          <span className="label">Song</span>
         </NavLink>
       ),
     },
@@ -253,22 +205,7 @@ function Sidenav({ color }) {
         </NavLink>
       ),
     },
-    {
-      key: "/membership",
-      label: (
-        <NavLink to="/membership">
-          <span
-            className="icon"
-            style={{
-              backgroundColor: selectedKey === "membership" ? "#f0f2f5" : "",
-            }}
-          >
-            <IdcardOutlined />
-          </span>
-          <span className="label">Membership</span>
-        </NavLink>
-      ),
-    },
+
   ];
 
   const handleMenuKey = (key) => {

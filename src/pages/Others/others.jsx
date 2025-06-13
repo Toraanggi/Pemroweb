@@ -14,7 +14,7 @@ import { getData, sendData, deleteData } from "../../utils/api";
 
 const { Title, Text } = Typography;
 
-const Gallery = () => {
+const Others = () => {
   const [api, contextHolder] = notification.useNotification();
   const [dataSources, setDataSources] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -24,7 +24,7 @@ const Gallery = () => {
   const [idSelected, setIdSelected] = useState(null);
   const [searchText, setSearchText] = useState("");
   useEffect(() => {
-    getDataGallery();
+    getDataOthers();
   }, []);
 
   const openNotificationWithIcon = (type, Title, msg) => {
@@ -34,7 +34,7 @@ const Gallery = () => {
     });
   };
 
-  const getDataGallery = async () => {
+  const getDataOthers = async () => {
     setIsLoading(true);
     try {
       const resp = await getData("/api/v1/natures");
@@ -81,12 +81,12 @@ const Gallery = () => {
     sendData(url, formData)
       .then((resp) => {
         if (resp?.datas) {
-          openNotificationWithIcon("success", "Data Gallery", "Data Berhasil Dikirim"+ msg);
-          getDataGallery();
+          openNotificationWithIcon("success", "Data Others", "Data Berhasil Dikirim"+ msg);
+          getDataOthers();
           formInputNature.resetFields();
           onCloseDrawer();
         } else {
-          openNotificationWithIcon("error", "Data Gallery", "Data Gagal Terkirim");
+          openNotificationWithIcon("error", "Data Others", "Data Gagal Terkirim");
         }
       })
       .catch((err) => {
@@ -119,10 +119,10 @@ const Gallery = () => {
     deleteData(url, params)
       .then((resp) => {
         if (resp?.status=== 200) {
-          openNotificationWithIcon("success", "Data Gallery", "Data Berhasil Dihapus");
-          getDataGallery();
+          openNotificationWithIcon("success", "Data Others", "Data Berhasil Dihapus");
+          getDataOthers();
         } else {
-          openNotificationWithIcon("error", "Data Gallery", "Data Gagal Dihapus");
+          openNotificationWithIcon("error", "Data Others", "Data Gagal Dihapus");
         }
       })
       .catch((err) => {
@@ -234,4 +234,4 @@ const Gallery = () => {
   );
 };
 
-export default Gallery;
+export default Others;
