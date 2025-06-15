@@ -9,8 +9,7 @@ import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
 import Blank from "./pages/Blank";
-import Others from "./pages/Others/others";
-import Educations from "./pages/Educations/educations";
+
 
 
 function App() {
@@ -26,34 +25,10 @@ function App() {
         />
         <Route
           exact
-          path="/educations"
-          element={<PrivateRoute component={<Educations />} />}
-        />
-        <Route
-          exact
-          path="/music"
-          element={<PrivateRoute component={<Blank />} />}
-        />
-        <Route
-          exact
-          path="/movie"
-          element={<PrivateRoute component={<Blank />} />}
-        />
-        <Route
-          exact
-          path="/song"
-          element={<PrivateRoute component={<Blank />} />}
-        />                
-        <Route
-          exact
           path="/profile"
           element={<PrivateRoute component={<Blank />} />}
         />
-        <Route
-          exact
-          path="/others"
-          element={<PrivateRoute component={<Others />} />}
-        />
+
       </Routes>
     </div>
   );
