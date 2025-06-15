@@ -21,11 +21,11 @@ function Footer() {
       <Row className="just">
         <Col xs={24} md={12} lg={12}>
           <div className="copyright">
-            © 2024, made with by
+            © 2024, made with ❤️ by
             <a href="#pablo" className="font-weight-bold" target="_blank">
-              WebfmSI.com
+              Athena Lumina Team
             </a>
-            for a better point of sales management.
+            for a better experience of entertainment playlist.
           </div>
         </Col>
       </Row>

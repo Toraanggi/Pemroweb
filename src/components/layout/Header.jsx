@@ -31,6 +31,13 @@ const ButtonContainer = styled.div`
   }
 `;
 
+const PageTitle = styled(Typography.Title)`
+  margin: 0 !important;
+  font-size: 20px !important;
+  font-weight: 600 !important;
+  color: #141414 !important;
+`;
+
 const logsetting = [
   <svg
     width="20"
@@ -93,10 +100,26 @@ function Header({
   const { Title, Text } = Typography;
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
-  const [searchText, setSearchText] = useState("");
   const location = useLocation();
   const pathSegments = location.pathname.split("/");
   pathSegments.shift();
+
+  // Get current page title based on path
+  const getPageTitle = () => {
+    const path = location.pathname;
+    switch(path) {
+      case '/dashboard':
+        return 'Dashboard';
+      case '/community':
+        return 'Community';
+      case '/subscription':
+        return 'Subscription';
+      case '/profile':
+        return 'Profile';
+      default:
+        return 'Dashboard';
+    }
+  };
 
   useEffect(() => window.scrollTo(0, 0));
 
@@ -134,12 +157,9 @@ function Header({
     <>
       <Row gutter={[24, 0]}>
         <Col span={24} md={8}>
-          <div></div>
+          <PageTitle level={4}>{getPageTitle()}</PageTitle>
         </Col>
         <Col span={24} md={16} className="header-control">
-          <Button type="link" onClick={showDrawer}>
-            {logsetting}
-          </Button>
           <Button
             type="link"
             className="sidebar-toggler"

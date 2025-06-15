@@ -12,7 +12,8 @@ import {
   Form,
   List,
   Spin,
-  Drawer
+  Drawer,
+  Select
 } from "antd";
 import {
   EditOutlined,
@@ -97,7 +98,7 @@ const Dashboard = () => {
         setSubmitting(true);
         const formData = new FormData();
         formData.append("play_name", values.title);
-        formData.append("play_genre", "");
+        formData.append("play_genre", values.genre);
         formData.append("play_url", values.url);
         formData.append("play_description", values.description);
         formData.append("play_thumbnail", values.thumbnail);
@@ -133,7 +134,8 @@ const Dashboard = () => {
       title: item.play_name,
       url: item.play_url,
       description: item.play_description,
-      thumbnail: item.play_thumbnail
+      thumbnail: item.play_thumbnail,
+      genre: item.play_genre
     });
     setCurrentId(item.id_play);
     setEditMode(true);
@@ -141,7 +143,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="layout-content">
+    <div style={{ maxWidth:2000, margin: '24px auto' }}>
       {contextHolder}
       <Row gutter={[24, 0]}>
         <Col xs={24}>
@@ -186,17 +188,34 @@ const Dashboard = () => {
                 </Form.Item>
 
                 <Form.Item
+                  name="genre"
+                  label="Genre"
+                  rules={[{ required: true, message: 'Genre harus dipilih' }]}
+                >
+                  <Select
+                    placeholder="Pilih genre video"
+                    options={[
+                      { value: 'song', label: 'Song' },
+                      { value: 'music', label: 'Music' },
+                      { value: 'education', label: 'Education' },
+                      { value: 'movie', label: 'Movie' },
+                      { value: 'others', label: 'Others' }
+                    ]}
+                  />
+                </Form.Item>
+
+                <Form.Item
                   name="url"
                   label="URL YouTube"
                   rules={[
-                    { required: true, message: 'URL harus diisi' }  ,
+                    { required: true, message: 'URL harus diisi' },
                     { 
                       pattern: /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/,
                       message: 'URL YouTube tidak valid' 
                     }
                   ]}
                 >
-                  <Input placeholder="https://youtube.com/watch?v=..." />
+                  <Input placeholder="Contoh: https://youtube.com/watch?v=..." />
                 </Form.Item>
 
                 <Form.Item
@@ -221,7 +240,7 @@ const Dashboard = () => {
                     }
                   ]}
                 >
-                  <Input placeholder="Masukkan URL thumbnail" />
+                  <Input placeholder="Contoh: https://img.youtube.com/vi/..." />
                 </Form.Item>
               </Form>
             </Drawer>

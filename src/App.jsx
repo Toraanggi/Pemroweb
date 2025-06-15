@@ -7,9 +7,12 @@ import "./assets/styles/adaptive.css";
 
 import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import Profile from "./pages/Profile";
 import PrivateRoute from "./components/layout/PrivateRoute";
 import Blank from "./pages/Blank";
-import Profile from "./pages/Profile";
+import Community from "./pages/Community";
+import Subscription from "./pages/Subscription";
+
 
 function App() {
   return (
@@ -21,6 +24,16 @@ function App() {
           exact
           path="/dashboard"
           element={<PrivateRoute component={<Dashboard />} />}
+        />
+        <Route
+          exact
+          path="/community"
+          element={<PrivateRoute component={<Community />} />}
+        />
+        <Route
+          exact
+          path="/subscription"
+          element={<PrivateRoute component={<Subscription />} />}
         />
         <Route
           exact

@@ -90,23 +90,34 @@ function Sidenav({ color }) {
     },
 
     {
-      key: "6",
-      label: "Users Management",
-      className: "menu-item-header",
-    },
-    {
-      key: "/profile",
+      key: "/community",
       label: (
-        <NavLink to="/profile">
+        <NavLink to="/community">
           <span
             className="icon"
             style={{
-              backgroundColor: selectedKey === "profile" ? "#f0f2f5" : "",
+              backgroundColor: selectedKey === "dashboard" ? "#f0f2f5" : "",
             }}
           >
-            {profile}
+            {dashboard}
           </span>
-          <span className="label">Profile</span>
+          <span className="label">Community</span>
+        </NavLink>
+      ),
+    },
+    {
+      key: "/subscription",
+      label: (
+        <NavLink to="/subscription">
+          <span
+            className="icon"
+            style={{
+              backgroundColor: selectedKey === "dashboard" ? "#f0f2f5" : "",
+            }}
+          >
+            {dashboard}
+          </span>
+          <span className="label">Subscription</span>
         </NavLink>
       ),
     },
@@ -120,7 +131,7 @@ function Sidenav({ color }) {
   return (
     <>
       <div className="brand">
-        <span>WebfmSI.com</span>
+        <span>EnPlay.com</span>
       </div>
       <hr />
       <Menu

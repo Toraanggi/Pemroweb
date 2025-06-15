@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Row, Col, Card, Avatar, Typography, Form, Input, Button, Tabs, Upload } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Row, Col, Card, Avatar, Typography, Form, Input, Button, Tabs, Upload, message, notification } from 'antd';
 import { UserOutlined, MailOutlined, PhoneOutlined, LockOutlined, UploadOutlined } from '@ant-design/icons';
 import styled from 'styled-components';
 
@@ -10,24 +10,55 @@ const StyledCard = styled(Card)`
   .ant-card-head {
     border-bottom: 1px solid #f0f0f0;
   }
-  .ant-upload-list-picture-card .ant-upload-list-item {
-    padding: 8px;
-    border: 1px solid #d9d9d9;
-    border-radius: 8px;
-  }
 `;
 
 const Profile = () => {
   const [form] = Form.useForm();
+  const [securityForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [userData, setUserData] = useState({
+    fullname: '',
+    email: '',
+    phone: '',
+  });
 
-  const onFinish = (values) => {
+  // Ambil data dari localStorage saat pertama kali render
+  useEffect(() => {
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      setUserData(storedUser);
+      form.setFieldsValue({
+        name: storedUser.fullname,
+        email: storedUser.email,
+        phone: storedUser.phone,
+      });
+    }
+  }, [form]);
+
+  const onUpdateProfile = (values) => {
     setLoading(true);
-    // Here you would typically make an API call to update the user profile
-    console.log('Profile update values:', values);
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
+    const updatedUser = {
+      ...userData,
+      fullname: values.name,
+      email: values.email,
+      phone: values.phone,
+    };
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+    setUserData(updatedUser);
+    notification.success({
+      message: 'Success',
+      description: 'Your profile has been updated successfully!',
+    });
+    setLoading(false);
+  };
+
+  const onPasswordChange = (values) => {
+    console.log("Password changed:", values);
+    notification.success({
+      message: 'Success',
+      description: 'Your password has been updated successfully!',
+    });
+    securityForm.resetFields();
   };
 
   const items = [
@@ -38,12 +69,7 @@ const Profile = () => {
         <Form
           form={form}
           layout="vertical"
-          onFinish={onFinish}
-          initialValues={{
-            name: 'John Doe',
-            email: 'john.doe@example.com',
-            phone: '+1234567890',
-          }}
+          onFinish={onUpdateProfile}
         >
           <Row gutter={[24, 0]}>
             <Col span={24}>
@@ -89,7 +115,7 @@ const Profile = () => {
       key: '2',
       label: 'Security',
       children: (
-        <Form layout="vertical">
+        <Form layout="vertical" form={securityForm} onFinish={onPasswordChange}>
           <Row gutter={[24, 0]}>
             <Col span={24}>
               <Form.Item
@@ -130,7 +156,7 @@ const Profile = () => {
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Button type="primary" loading={loading}>
+              <Button type="primary" onClick={onPasswordChange} loading={loading}>
                 Change Password
               </Button>
             </Col>
@@ -141,28 +167,17 @@ const Profile = () => {
   ];
 
   return (
-    <div style={{ padding: '24px' }}>
+    <div style={{ maxWidth:2000, margin: '24px auto' }}>
       <Row gutter={[24, 24]}>
         <Col span={24}>
           <StyledCard>
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               <Avatar size={100} icon={<UserOutlined />} />
               <Title level={3} style={{ marginTop: '16px', marginBottom: '8px' }}>
-                John Doe
+                {userData.fullname}
               </Title>
-              <Text type="secondary">john.doe@example.com</Text>
+              <Text type="secondary">{userData.email}</Text>
             </div>
-            <Upload
-              name="avatar"
-              listType="picture-card"
-              showUploadList={false}
-              action="/api/upload" // Replace with your upload endpoint
-            >
-              <div>
-                <UploadOutlined />
-                <div style={{ marginTop: 8 }}>Change Avatar</div>
-              </div>
-            </Upload>
           </StyledCard>
         </Col>
         <Col span={24}>
@@ -175,4 +190,4 @@ const Profile = () => {
   );
 };
 
-export default Profile; 
+export default Profile;

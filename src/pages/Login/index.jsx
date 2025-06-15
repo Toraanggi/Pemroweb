@@ -1,5 +1,5 @@
 import { Layout, Button, Row, Col, Typography, Form, Input } from "antd";
-import SignBG from "../../assets/images/curve-1.svg";
+import SignBG from "../../assets/images/Headphone-amico.png";
 import "./login.css";
 import { useState } from "react";
 
@@ -13,16 +13,32 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
-    console.log(username, password);
+  const handleLogin = () => {
+    const generatedPhone = `+${Math.floor(1000000000 + Math.random() * 9000000000)}`;
+    const fullname = username; // capitalize
+    const email = `${username}@mail.com`;
+  
+    // Simpan ke localStorage
+    localStorage.setItem(
+      "user",
+      JSON.stringify({
+        username,
+        fullname,
+        email,
+        phone: generatedPhone,
+      })
+    );
+  
+    // Navigasi ke halaman dashboard
     navigate("/dashboard", { replace: true });
   };
+  
 
   return (
     <Layout className="layout-default layout-signin">
       <Header>
         <div className="header-col header-brand">
-          <h5>WebfmSI.com</h5>
+          <h5>EnPlay.com</h5>
         </div>
         <div className="header-col header-nav">test</div>
         <div className="header-col header-btn">
@@ -38,7 +54,8 @@ const LoginPage = () => {
             md={{ span: 12 }}
           >
             <img src={SignBG} alt="" />
-            {/* <img src="/login.gif" alt="img-login" /> */}
+            {/* <a href="https://storyset.com/music">Music illustrations by Storyset</a> */}
+           
           </Col>
           <Col xs={{ span: 24 }} lg={{ span: 8 }} md={{ span: 12 }}>
             <Title className="mb-15">Sign In</Title>
@@ -100,8 +117,11 @@ const LoginPage = () => {
       <Footer>
         <p className="copyright">
           {" "}
-          Copyright © 2024 WebfmSI.com - Powered by Universitas Pendidikan
-          Ganesha
+          © 2025, made with ❤️ by
+            <a href="#pablo" className="font-weight-bold" target="_blank">
+              Athena Lumina Team
+            </a>
+            for a better experience of entertainment playlist.
         </p>
       </Footer>
     </Layout>
