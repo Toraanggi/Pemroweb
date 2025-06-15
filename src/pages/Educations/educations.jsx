@@ -58,16 +58,11 @@ const Educations = () => {
     getData("/api/playlist/45")
       .then((response) => {
         if (response && Array.isArray(response.datas)) {
-<<<<<<< HEAD
-          setPlaylistData(response.datas); // Menyimpan data asli
-          setFilteredData(response.datas); // Menyimpan data hasil filter
-=======
         const educationData = response.datas.filter(
           (item) => item.play_genre === "education"
         );
           setPlaylistData(educationData);
           setFilteredData(educationData);
->>>>>>> b4ae410dc3995f0a902bcc381f8a1be850f35461
         } else {
           showAlert("error", "Error", "No data available"); 
           setPlaylistData([]); // Reset data jika response tidak valid
