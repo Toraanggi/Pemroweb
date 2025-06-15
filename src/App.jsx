@@ -8,7 +8,6 @@ import "./assets/styles/adaptive.css";
 import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
-
 import Blank from "./pages/Blank";
 import Others from "./pages/Others/others";
 import Educations from "./pages/Educations/educations";

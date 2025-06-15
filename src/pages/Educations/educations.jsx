@@ -25,21 +25,25 @@ import { getData, sendData, deleteData } from "../../utils/api";
 const { Title, Text } = Typography;
 
 const Educations = () => {
-  const [playlistData, setPlaylistData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchText, setSearchText] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
-  const [api, contextHolder] = notification.useNotification();
-  const [form] = Form.useForm();
+  // STATE MANAGEMENT
+  const [playlistData, setPlaylistData] = useState([]); // Menyimpan data playlist dari API
+  const [filteredData, setFilteredData] = useState([]); // Menyimpan data hasil filter/pencarian
+  const [searchText, setSearchText] = useState(""); // Menyimpan teks pencarian
+  const [loading, setLoading] = useState(false); // Status loading saat mengambil data
+  const [submitting, setSubmitting] = useState(false); // Status loading saat submit form
+  const [openDrawer, setOpenDrawer] = useState(false); // Mengontrol tampilan drawer
+  const [editMode, setEditMode] = useState(false); // Mode edit atau tambah data
+  const [currentId, setCurrentId] = useState(null); // ID playlist yang sedang diedit
+  const [api, contextHolder] = notification.useNotification(); // Sistem notifikasi
+  const [form] = Form.useForm(); // Instans form untuk form drawer
 
+  // Mengambil data playlist saat komponen pertama kali render
   useEffect(() => {
     fetchPlaylistData();
   }, []);
 
+  //Memfilter data playlist saat searchText atau playlistData berubah
+  //Mencari berdasarkan judul dan deskripsi playlist
   useEffect(() => {
     const filtered = playlistData.filter(item =>
       item.play_name.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -48,6 +52,7 @@ const Educations = () => {
     setFilteredData(filtered);
   }, [searchText, playlistData]);
 
+  //Fungsi untuk mengambil data playlist dari API
   const fetchPlaylistData = () => {
     setLoading(true);
     getData("/api/playlist/45")
@@ -59,16 +64,20 @@ const Educations = () => {
           setPlaylistData(educationData);
           setFilteredData(educationData);
         } else {
-          showAlert("error", "Error", "No data available");
-          setPlaylistData([]);
+          showAlert("error", "Error", "No data available"); 
+          setPlaylistData([]); // Reset data jika response tidak valid
         }
       })
       .catch(() => {
         showAlert("error", "Error", "Failed to load playlist data");
       })
-      .finally(() => setLoading(false));
+      .finally(() => setLoading(false)); // Menyembunyikan loading
   };
 
+  // Menampilkan notifikasi
+  //  * @param {string} status - Jenis notifikasi ('success', 'error', dll)
+  //  * @param {string} title - Judul notifikasi
+  //  * @param {string} description - Pesan notifikasi
   const showAlert = (status, title, description) => {
     api[status]({
       message: title,
@@ -76,6 +85,8 @@ const Educations = () => {
     });
   };
 
+  // Menghandle penghapusan playlist
+  //  * @param {number} id - ID playlist yang akan dihapus
   const handleDelete = (id) => {
     deleteData(`/api/playlist/${id}`)
       .then((response) => {
@@ -83,7 +94,7 @@ const Educations = () => {
           showAlert("error", "Failed", "Playlist not found");
         } else {
           showAlert("success", "Success", "Playlist deleted successfully");
-          fetchPlaylistData();
+          fetchPlaylistData(); // Memperbarui data setelah penghapusan
         }
       })
       .catch((error) => {
@@ -92,17 +103,19 @@ const Educations = () => {
       });
   };
 
+  // Menghandle submit form (baik create maupun update)
   const handleSubmit = () => {
     form.validateFields()
       .then(values => {
         setSubmitting(true);
         const formData = new FormData();
         formData.append("play_name", values.title);
-        formData.append("play_genre", "education");
+        formData.append("play_genre", "education"); // Default genre 'education'
         formData.append("play_url", values.url);
         formData.append("play_description", values.description);
         formData.append("play_thumbnail", values.thumbnail);
 
+        // Tentukan endpoint API berdasarkan mode edit
         const url = editMode ? `/api/playlist/update/${currentId}` : "/api/playlist/45";
         const request = sendData(url, formData);
 
@@ -114,8 +127,8 @@ const Educations = () => {
                 editMode ? "Updated" : "Added",
                 `Playlist ${editMode ? 'updated' : 'added'} successfully`
               );
-              setOpenDrawer(false);
-              fetchPlaylistData();
+              setOpenDrawer(false); // Tutup drawer
+              fetchPlaylistData(); // Segarkan data
             }
           })
           .catch((err) => {
@@ -129,6 +142,8 @@ const Educations = () => {
       });
   };
 
+  // Mengatur mode edit untuk playlist
+  // @param {object} item - Data playlist yang akan diedit
   const handleEdit = (item) => {
     form.setFieldsValue({
       title: item.play_name,
@@ -136,9 +151,9 @@ const Educations = () => {
       description: item.play_description,
       thumbnail: item.play_thumbnail
     });
-    setCurrentId(item.id_play);
-    setEditMode(true);
-    setOpenDrawer(true);
+    setCurrentId(item.id_play); // Simpan ID untuk operasi update
+    setEditMode(true); // Aktifkan mode edit
+    setOpenDrawer(true); // Buka drawer
   };
 
   return (
@@ -147,16 +162,19 @@ const Educations = () => {
       <Row gutter={[24, 0]}>
         <Col xs={24}>
           <Card bordered={false} className="circlebox h-full w-full">
+            
+            {/* Tombol aksi mengambang untuk menambah playlist baru */}
             <FloatButton
               icon={<PlusCircleOutlined />}
               type="primary"
               onClick={() => {
-                form.resetFields();
-                setEditMode(false);
-                setOpenDrawer(true);
+                form.resetFields(); 
+                setEditMode(false); 
+                setOpenDrawer(true); 
               }}
             />
 
+            {/* Drawer untuk menambah/mengedit playlist */}
             <Drawer
               title={editMode ? "Edit Playlist" : "Tambah Playlist"}
               width={500}
@@ -177,6 +195,8 @@ const Educations = () => {
                 </div>
               }
             >
+
+              {/* Form untuk data playlist */}
               <Form form={form} layout="vertical">
                 <Form.Item
                   name="title"
@@ -227,9 +247,11 @@ const Educations = () => {
               </Form>
             </Drawer>
 
+            {/* Header halaman */}
             <Title level={2}>Playlist Edukasi</Title>
             <Text style={{ fontSize: "12pt" }}>Daftar video pembelajaran</Text>
-
+            
+            {/* Input pencarian */}
             <Input
               prefix={<SearchOutlined />}
               placeholder="Cari video..."
@@ -240,6 +262,7 @@ const Educations = () => {
               style={{ marginBottom: 24 }}
             />
 
+            {/* Render bersyarat berdasarkan state */}
             {loading ? (
               <div style={{ textAlign: 'center', padding: '24px' }}>
                 <Spin tip="Memuat data..." size="large" />
