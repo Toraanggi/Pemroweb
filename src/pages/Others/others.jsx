@@ -1,226 +1,291 @@
+import React, { useState, useEffect } from "react";
 import {
-  Col, Row, Typography, Card, List, FloatButton, Drawer, Form, Input, Button, notification, Popconfirm
+  Card,
+  Button,
+  Typography,
+  Row,
+  Col,
+  Popconfirm,
+  notification,
+  Input,
+  FloatButton,
+  Form,
+  List,
+  Spin,
+  Drawer
 } from "antd";
-import { useEffect, useState } from "react";
 import {
-  DeleteColumnOutlined,
   EditOutlined,
+  DeleteOutlined,
   PlusCircleOutlined,
   SearchOutlined,
-  DeleteOutlined
-} from '@ant-design/icons';
-
+} from "@ant-design/icons";
 import { getData, sendData, deleteData } from "../../utils/api";
 
 const { Title, Text } = Typography;
 
 const Others = () => {
-  const [api, contextHolder] = notification.useNotification();
-  const [dataSources, setDataSources] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isOpenDrawer, setIsOpenDrawer] = useState(false);
-  const [formInputNature] = Form.useForm();
-  const [isEdit, setIsEdit] = useState(false);
-  const [idSelected, setIdSelected] = useState(null);
+  const [playlistData, setPlaylistData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [searchText, setSearchText] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [openDrawer, setOpenDrawer] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
+  const [api, contextHolder] = notification.useNotification();
+  const [form] = Form.useForm();
+
   useEffect(() => {
-    getDataOthers();
+    fetchPlaylistData();
   }, []);
 
-  const openNotificationWithIcon = (type, Title, msg) => {
-    api[type]({
-      message: Title,
-      description: msg,
+
+  const fetchPlaylistData = () => {
+    setLoading(true);
+    getData("/api/playlist/45")
+      .then((response) => {
+        if (response && Array.isArray(response.datas)) {
+        const OthersData = response.datas.filter(
+          (item) => item.play_genre === "others"
+        );
+          setPlaylistData(OthersData);
+          setFilteredData(OthersData);
+        } else {
+          showAlert("error", "Error", "No data available");
+          setPlaylistData([]);
+        }
+      })
+      .catch(() => {
+        showAlert("error", "Error", "Failed to load playlist data");
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const showAlert = (status, title, description) => {
+    api[status]({
+      message: title,
+      description: description,
     });
   };
 
-  const getDataOthers = async () => {
-    setIsLoading(true);
-    try {
-      const resp = await getData("/api/v1/natures");
-      setIsLoading(false);
-      if (resp) {
-        setDataSources(resp);
-      } else {
-        console.log("Something went wrong");
-      }
-    } catch (err) {
-      setIsLoading(false);
-      console.error(err);
-    }
-  };
-
-  const handleDrawer = () => {
-    setIsOpenDrawer(true);
-  };
-
-  const onCloseDrawer = () => {
-   
-    if (isEdit) {
-      setIsEdit(false);
-      setIdSelected(null);
-    }
-    
-    setIsOpenDrawer(false);
-    formInputNature.resetFields();
-    
+  const handleDelete = (id) => {
+    deleteData(`/api/playlist/${id}`)
+      .then((response) => {
+        if (response.status === 404) {
+          showAlert("error", "Failed", "Playlist not found");
+        } else {
+          showAlert("success", "Success", "Playlist deleted successfully");
+          fetchPlaylistData();
+        }
+      })
+      .catch((error) => {
+        showAlert("error", "Failed", "An error occurred while deleting the data");
+        console.error(error);
+      });
   };
 
   const handleSubmit = () => {
-    let title = formInputNature.getFieldValue("title");
-    let description = formInputNature.getFieldValue("Description");
+    form.validateFields()
+      .then(values => {
+        setSubmitting(true);
+        const formData = new FormData();
+        formData.append("play_name", values.title);
+        formData.append("play_genre", "others");
+        formData.append("play_url", values.url);
+        formData.append("play_description", values.description);
+        formData.append("play_thumbnail", values.thumbnail);
 
-    let formData = new FormData();
-    formData.append("name_natures", title);
-    formData.append("description", description);
+        const url = editMode ? `/api/playlist/update/${currentId}` : "/api/playlist/45";
+        const request = sendData(url, formData);
 
-    let url = isEdit ? `/api/v1/natures/${idSelected}` : "/api/v1/natures";
-    let msg = isEdit ? ", Sukses mengubah data" : ", Sukses menambahkan data";
-    
-
-    sendData(url, formData)
-      .then((resp) => {
-        if (resp?.datas) {
-          openNotificationWithIcon("success", "Data Others", "Data Berhasil Dikirim"+ msg);
-          getDataOthers();
-          formInputNature.resetFields();
-          onCloseDrawer();
-        } else {
-          openNotificationWithIcon("error", "Data Others", "Data Gagal Terkirim");
-        }
+        request
+          .then((res) => {
+            if (res?.datas) {
+              showAlert(
+                "success",
+                editMode ? "Updated" : "Added",
+                `Playlist ${editMode ? 'updated' : 'added'} successfully`
+              );
+              setOpenDrawer(false);
+              fetchPlaylistData();
+            }
+          })
+          .catch((err) => {
+            console.error(err);
+            showAlert("error", "Error", "Failed to submit data");
+          })
+          .finally(() => setSubmitting(false));
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(info => {
+        console.log('Validate Failed:', info);
       });
   };
 
-  const handleDrawerEdit = (record) => {
-    setIsOpenDrawer(true);
-    setIsEdit(true);
-    setIdSelected(record?.id);
-    formInputNature.setFieldsValue({
-      title: record?.name_natures,
-      Description: record?.description,
+  const handleEdit = (item) => {
+    form.setFieldsValue({
+      title: item.play_name,
+      url: item.play_url,
+      description: item.play_description,
+      thumbnail: item.play_thumbnail
     });
-  };
-  
-  const handleSearch = (search) => {
-    setSearchText(search.toLowerCase());
+    setCurrentId(item.id_play);
+    setEditMode(true);
+    setOpenDrawer(true);
   };
 
-  let dataSourcesFiltered = dataSources.filter((item) => {
-    return item?.name_natures.toLowerCase().includes(searchText);
-  });
-
-  const confirmDelete =  (record) => {
-    let url = `/api/v1/natures/${record?.id}`;
-    let params = new URLSearchParams();
-    params.append("id", record?.id);
-    deleteData(url, params)
-      .then((resp) => {
-        if (resp?.status=== 200) {
-          openNotificationWithIcon("success", "Data Others", "Data Berhasil Dihapus");
-          getDataOthers();
-        } else {
-          openNotificationWithIcon("error", "Data Others", "Data Gagal Dihapus");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-
-  };
   return (
     <div className="layout-content">
       {contextHolder}
       <Row gutter={[24, 0]}>
-        <Col xs={23} className="mb-24">
+        <Col xs={24}>
           <Card bordered={false} className="circlebox h-full w-full">
             <FloatButton
-              shape="circle"
-              type="primary"
               icon={<PlusCircleOutlined />}
-              onClick={handleDrawer}
+              type="primary"
+              onClick={() => {
+                form.resetFields();
+                setEditMode(false);
+                setOpenDrawer(true);
+              }}
             />
 
             <Drawer
-              title={isEdit ? "Edit Data" : "Tambah Data"}
-              onClose={onCloseDrawer}
-              open={isOpenDrawer}
-              extra={
-                <Button type="primary" onClick={handleSubmit}>
-                  SUBMIT
-                </Button>
+              title={editMode ? "Edit Playlist" : "Tambah Playlist"}
+              width={500}
+              open={openDrawer}
+              onClose={() => setOpenDrawer(false)}
+              footer={
+                <div style={{ textAlign: 'right' }}>
+                  <Button onClick={() => setOpenDrawer(false)} style={{ marginRight: 8 }}>
+                    Batal
+                  </Button>
+                  <Button 
+                    type="primary"
+                    onClick={handleSubmit}
+                    loading={submitting}
+                  >
+                    {editMode ? "Update" : "Simpan"}
+                  </Button>
+                </div>
               }
             >
-              <Form form={formInputNature} layout="vertical">
+              <Form form={form} layout="vertical">
                 <Form.Item
-                  label="Title"
                   name="title"
-                  rules={[{ required: true, message: "Please input your title!" }]}
+                  label="Judul Video"
+                  rules={[{ required: true, message: 'Judul harus diisi' }]}
                 >
-                  <Input placeholder="Title" />
+                  <Input placeholder="Contoh: Tutorial React Dasar" />
                 </Form.Item>
 
-                <Form.Item label="Description" name="Description">
-                  <Input.TextArea rows={3} placeholder="Description" />
+                <Form.Item
+                  name="url"
+                  label="URL YouTube"
+                  rules={[
+                    { required: true, message: 'URL harus diisi' }  ,
+                    { 
+                      pattern: /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/,
+                      message: 'URL YouTube tidak valid' 
+                    }
+                  ]}
+                >
+                  <Input placeholder="https://youtube.com/watch?v=..." />
+                </Form.Item>
+
+                <Form.Item
+                  name="description"
+                  label="Deskripsi"
+                  rules={[{ required: true, message: 'Deskripsi harus diisi' }]}
+                >
+                  <Input.TextArea rows={4} placeholder="Deskripsi video" />
+                </Form.Item>
+
+                <Form.Item
+                  name="thumbnail"
+                  label="Thumbnail URL"
+                  rules={[
+                    { 
+                      required: true, 
+                      message: 'Thumbnail wajib diisi' 
+                    },
+                    { 
+                      type: 'url', 
+                      message: 'URL tidak valid' 
+                    }
+                  ]}
+                >
+                  <Input placeholder="Masukkan URL thumbnail" />
                 </Form.Item>
               </Form>
             </Drawer>
 
-            <Title>List of Nature</Title>
-            <Text style={{ fontSize: "12pt" }}>Tambahkan Konten Disini...</Text>
-            <Input 
-              prefix={<SearchOutlined />}
-              placeholder="input search text"
-              className="Header Search"
-              allowClear
-              size="large"
-              onChange={(e) => handleSearch(e.target.value)}
-            /> 
-            {isLoading ? (
-              <div>Sedang menunggu data...</div>
+            <Title level={2}>Playlist Lainnya</Title>
+            <Text style={{ fontSize: "12pt" }}>Daftar video pembelajaran</Text>
+
+
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '24px' }}>
+                <Spin tip="Memuat data..." size="large" />
+              </div>
+            ) : filteredData.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '24px' }}>
+                <Text type="secondary">
+                  {searchText ? 'Tidak ditemukan hasil pencarian' : 'Belum ada data playlist'}
+                </Text>
+              </div>
             ) : (
               <List
                 grid={{
                   gutter: 16,
                   xs: 1,
-                  sm: 1,
-                  md: 2,
+                  sm: 2,
+                  md: 3,
                   lg: 3,
                   xl: 3,
                 }}
-                dataSource={dataSourcesFiltered ?? []}
-                renderItem={(item) => (
-                  <List.Item key={item?.id}>
+                dataSource={filteredData}
+                renderItem={item => (
+                  <List.Item key={item.id_play}>
                     <Card
+                      hoverable
                       cover={
-                        <img
-                          key={item?.id}
-                          src={`${item?.url_photo}`}
-                          alt="categories-image"
-                        />
+                        <a href={item.play_url} target="_blank" rel="noopener noreferrer">
+                          <img
+                            alt="thumbnail"
+                            src={item.play_thumbnail || 'https://via.placeholder.com/300x200?text=No+Thumbnail'}
+                            style={{ 
+                              height: '200px', 
+                              objectFit: 'fill',
+                              borderTopRightRadius: '10px',
+                              borderTopLeftRadius: '10px',
+                              width: '100%'
+                            }}
+                          />
+                        </a>
                       }
                       actions={[
-                        <EditOutlined onClick={() => handleDrawerEdit(item)} />,
-                        <SearchOutlined key={item?.id}/>,
-                        
+                        <EditOutlined 
+                          key="edit" 
+                          onClick={() => handleEdit(item)} 
+                        />,
                         <Popconfirm
-                          title="Delete the task"
-                          description={`apakah kamu yakin menghapus data ${item?.name_natures }?`}
-                          onConfirm={() => confirmDelete(item)} // Kirim item sebagai parameter
-                          onCancel={() => console.log("cancel")}
-                          okText="Yes"
-                          cancelText="No"
+                          title="Hapus playlist ini?"
+                          onConfirm={() => handleDelete(item.id_play)}
+                          okText="Ya"
+                          cancelText="Tidak"
                         >
-                          <DeleteOutlined key={item?.id} />
+                          <DeleteOutlined key="delete" />
                         </Popconfirm>
-                        
                       ]}
                     >
                       <Card.Meta
-                        title={<Text>{item?.name_natures}</Text>}
-                        description={<Text>{item?.description}</Text>}
+                        title={<Text strong ellipsis>{item.play_name || 'No Title'}</Text>}
+                        description={
+                          <Text ellipsis>
+                            {item.play_description || 'No description available'}
+                          </Text>
+                        }
                       />
                     </Card>
                   </List.Item>

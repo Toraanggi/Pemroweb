@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from "react";
 
-import { Row, Col, Button, Drawer, Typography, Switch } from "antd";
+import { Row, Col, Button, Drawer, Typography, Switch, Input } from "antd";
 
-import { LogoutOutlined } from "@ant-design/icons";
+import { LogoutOutlined, SearchOutlined } from "@ant-design/icons";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -72,9 +72,10 @@ function Header({
 
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
+  const [searchText, setSearchText] = useState("");
   const location = useLocation();
-  const pathSegments = location.pathname.split("/"); // Remove leading empty string
-  pathSegments.shift(); // Remove empty string if at the root path
+  const pathSegments = location.pathname.split("/");
+  pathSegments.shift();
 
   useEffect(() => window.scrollTo(0, 0));
 
@@ -87,14 +88,24 @@ function Header({
     navigate("/login", { replace: true });
   };
 
+  const handleSearch = (search) => {
+    setSearchText(search.toLowerCase());
+  };
+
   return (
     <>
-      {/* <div className="setting-drwer" onClick={showDrawer}>
-        {setting}
-      </div> */}
+    
+      <Input 
+        prefix={<SearchOutlined />}
+        placeholder="input search text"
+        className="Header Search"
+        allowClear
+        size="middle"
+        onChange={(e) => handleSearch(e.target.value)}
+      />
       <Row gutter={[24, 0]}>
         <Col span={24} md={8}>
-          <div>SIFORS</div>
+          <div></div>
         </Col>
         <Col span={24} md={16} className="header-control">
           <Button type="link" onClick={showDrawer}>
