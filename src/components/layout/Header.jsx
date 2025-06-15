@@ -69,13 +69,13 @@ function Header({
   handleFixedNavbar,
 }) {
   const { Title, Text } = Typography;
-  const [playlistData, setPlaylistData] = useState([]);
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
   const [searchText, setSearchText] = useState("");
   const location = useLocation();
   const pathSegments = location.pathname.split("/");
   pathSegments.shift();
+
 
   useEffect(() => window.scrollTo(0, 0));
 
@@ -88,25 +88,20 @@ function Header({
     navigate("/login", { replace: true });
   };
 
-
-  useEffect(() => {
-    const filtered = playlistData.filter(item =>
-      item.play_name.toLowerCase().includes(searchText.toLowerCase()) ||
-      item.play_description.toLowerCase().includes(searchText.toLowerCase())
-    );
-    setFilteredData(filtered);
-  }, [searchText, playlistData]);
+  const handleSearch = (search) => {
+    setSearchText(search.toLowerCase());
+  };
 
   return (
     <>
-    
+
       <Input 
         prefix={<SearchOutlined />}
         placeholder="input search text"
         className="Header Search"
         allowClear
         size="middle"
-        onChange={(e) => setSearchText(e.target.value)}
+        onChange={(e) => handleSearch(e.target.value)}
       />
       <Row gutter={[24, 0]}>
         <Col span={24} md={8}>
