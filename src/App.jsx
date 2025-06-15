@@ -9,8 +9,7 @@ import LoginPage from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import PrivateRoute from "./components/layout/PrivateRoute";
 import Blank from "./pages/Blank";
-
-
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -26,9 +25,8 @@ function App() {
         <Route
           exact
           path="/profile"
-          element={<PrivateRoute component={<Blank />} />}
+          element={<PrivateRoute component={<Profile />} />}
         />
-
       </Routes>
     </div>
   );

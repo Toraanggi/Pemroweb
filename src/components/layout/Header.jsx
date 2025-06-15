@@ -3,9 +3,9 @@
 
 import { useState, useEffect } from "react";
 
-import { Row, Col, Button, Drawer, Typography, Switch, Input } from "antd";
+import { Row, Col, Button, Drawer, Typography, Switch, Input, Dropdown, Avatar } from "antd";
 
-import { LogoutOutlined, SearchOutlined } from "@ant-design/icons";
+import { LogoutOutlined, SearchOutlined, UserOutlined, SettingOutlined } from "@ant-design/icons";
 
 import { useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
@@ -61,6 +61,28 @@ const toggler = [
   </svg>,
 ];
 
+const ProfileAvatarButton = styled(Button)`
+  background: #fff !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 0 !important;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.2s, border 0.2s;
+  border: 1.5px solid #f0f0f0;
+  &:hover, &:focus {
+    box-shadow: 0 4px 16px rgba(24,144,255,0.15);
+    border: 1.5px solid #1890ff;
+  }
+  &:active {
+    box-shadow: 0 2px 8px rgba(24,144,255,0.18);
+    border: 1.5px solid #096dd9;
+  }
+`;
+
 function Header({
   placement,
   onPress,
@@ -76,7 +98,6 @@ function Header({
   const pathSegments = location.pathname.split("/");
   pathSegments.shift();
 
-
   useEffect(() => window.scrollTo(0, 0));
 
   const showDrawer = () => setVisible(true);
@@ -88,9 +109,26 @@ function Header({
     navigate("/login", { replace: true });
   };
 
-  const handleSearch = (search) => {
-    setSearchText(search.toLowerCase());
-  };
+  const profileItems = [
+    {
+      key: '1',
+      label: 'Profile',
+      icon: <UserOutlined />,
+      onClick: () => navigate('/profile')
+    },
+    {
+      key: '2',
+      label: 'Settings',
+      icon: <SettingOutlined />,
+      onClick: showDrawer
+    },
+    {
+      key: '3',
+      label: 'Sign Out',
+      icon: <LogoutOutlined />,
+      onClick: doLogout
+    }
+  ];
 
   return (
     <>
@@ -109,6 +147,20 @@ function Header({
           >
             {toggler}
           </Button>
+          <Dropdown
+            menu={{ items: profileItems }}
+            placement="bottomRight"
+            arrow
+            overlayStyle={{ zIndex: 1200 }}
+          >
+            <ProfileAvatarButton
+              type="text"
+              aria-label="Open profile menu"
+              style={{ marginLeft: 8 }}
+            >
+              <Avatar icon={<UserOutlined />} size={32} style={{ background: '#e0e0e0', color: '#111' }} />
+            </ProfileAvatarButton>
+          </Dropdown>
           <Drawer
             className="settings-drawer"
             mask={true}
@@ -194,14 +246,6 @@ function Header({
               </div>
             </div>
           </Drawer>
-          <Button
-            className="btn-sign-in"
-            type="text"
-            onClick={() => doLogout()}
-          >
-            <LogoutOutlined />
-            <span>Sign Out</span>
-          </Button>
         </Col>
       </Row>
     </>
