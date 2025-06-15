@@ -94,15 +94,6 @@ function Header({
 
   return (
     <>
-
-      <Input 
-        prefix={<SearchOutlined />}
-        placeholder="input search text"
-        className="Header Search"
-        allowClear
-        size="middle"
-        onChange={(e) => handleSearch(e.target.value)}
-      />
       <Row gutter={[24, 0]}>
         <Col span={24} md={8}>
           <div></div>

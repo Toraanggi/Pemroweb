@@ -88,26 +88,11 @@ function Sidenav({ color }) {
         </NavLink>
       ),
     },
+
     {
       key: "7",
-      label: "Hiburan",
+      label: "Playlist saya",
       className: "menu-item-header",
-    },
-    {
-      key: "/others",
-      label: (
-        <NavLink to="/others">
-          <span
-            className="icon"
-            style={{
-              backgroundColor: selectedKey === "others" ? "#f0f2f5" : "",
-            }}
-          >
-            {dashboard}
-          </span>
-          <span className="label">Lainnya</span>
-        </NavLink>
-      ),
     },
         {
       label: (
@@ -166,6 +151,22 @@ function Sidenav({ color }) {
             <FileImageOutlined />
           </span>
           <span className="label">Song</span>
+        </NavLink>
+      ),
+    },
+        {
+      key: "/others",
+      label: (
+        <NavLink to="/others">
+          <span
+            className="icon"
+            style={{
+              backgroundColor: selectedKey === "others" ? "#f0f2f5" : "",
+            }}
+          >
+            {dashboard}
+          </span>
+          <span className="label">Lainnya</span>
         </NavLink>
       ),
     },

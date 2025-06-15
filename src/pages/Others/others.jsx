@@ -26,31 +26,28 @@ const { Title, Text } = Typography;
 
 const Others = () => {
   const [playlistData, setPlaylistData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
-  const [searchText, setSearchText] = useState("");
   const [loading, setLoading] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [openDrawer, setOpenDrawer] = useState(false);
-  const [editMode, setEditMode] = useState(false);
-  const [currentId, setCurrentId] = useState(null);
   const [api, contextHolder] = notification.useNotification();
-  const [form] = Form.useForm();
+  const [genreFilter, setGenreFilter] = useState("all");
+
+  const filteredData = genreFilter === "all"
+     ? playlistData
+     : playlistData.filter(item => item.play_genre === genreFilter);
+ 
 
   useEffect(() => {
     fetchPlaylistData();
   }, []);
-
 
   const fetchPlaylistData = () => {
     setLoading(true);
     getData("/api/playlist/45")
       .then((response) => {
         if (response && Array.isArray(response.datas)) {
-        const OthersData = response.datas.filter(
-          (item) => item.play_genre === "others"
-        );
+          const OthersData = response.datas.filter(
+            (item) => item.play_genre === "others"
+          );
           setPlaylistData(OthersData);
-          setFilteredData(OthersData);
         } else {
           showAlert("error", "Error", "No data available");
           setPlaylistData([]);
@@ -69,169 +66,94 @@ const Others = () => {
     });
   };
 
-  const handleDelete = (id) => {
-    deleteData(`/api/playlist/${id}`)
-      .then((response) => {
-        if (response.status === 404) {
-          showAlert("error", "Failed", "Playlist not found");
-        } else {
-          showAlert("success", "Success", "Playlist deleted successfully");
-          fetchPlaylistData();
-        }
-      })
-      .catch((error) => {
-        showAlert("error", "Failed", "An error occurred while deleting the data");
-        console.error(error);
-      });
-  };
-
-  const handleSubmit = () => {
-    form.validateFields()
-      .then(values => {
-        setSubmitting(true);
-        const formData = new FormData();
-        formData.append("play_name", values.title);
-        formData.append("play_genre", "others");
-        formData.append("play_url", values.url);
-        formData.append("play_description", values.description);
-        formData.append("play_thumbnail", values.thumbnail);
-
-        const url = editMode ? `/api/playlist/update/${currentId}` : "/api/playlist/45";
-        const request = sendData(url, formData);
-
-        request
-          .then((res) => {
-            if (res?.datas) {
-              showAlert(
-                "success",
-                editMode ? "Updated" : "Added",
-                `Playlist ${editMode ? 'updated' : 'added'} successfully`
-              );
-              setOpenDrawer(false);
-              fetchPlaylistData();
-            }
-          })
-          .catch((err) => {
-            console.error(err);
-            showAlert("error", "Error", "Failed to submit data");
-          })
-          .finally(() => setSubmitting(false));
-      })
-      .catch(info => {
-        console.log('Validate Failed:', info);
-      });
-  };
-
-  const handleEdit = (item) => {
-    form.setFieldsValue({
-      title: item.play_name,
-      url: item.play_url,
-      description: item.play_description,
-      thumbnail: item.play_thumbnail
-    });
-    setCurrentId(item.id_play);
-    setEditMode(true);
-    setOpenDrawer(true);
-  };
-
   return (
     <div className="layout-content">
       {contextHolder}
       <Row gutter={[24, 0]}>
         <Col xs={24}>
           <Card bordered={false} className="circlebox h-full w-full">
-            <FloatButton
-              icon={<PlusCircleOutlined />}
-              type="primary"
-              onClick={() => {
-                form.resetFields();
-                setEditMode(false);
-                setOpenDrawer(true);
-              }}
-            />
-
-            <Drawer
-              title={editMode ? "Edit Playlist" : "Tambah Playlist"}
-              width={500}
-              open={openDrawer}
-              onClose={() => setOpenDrawer(false)}
-              footer={
-                <div style={{ textAlign: 'right' }}>
-                  <Button onClick={() => setOpenDrawer(false)} style={{ marginRight: 8 }}>
-                    Batal
-                  </Button>
-                  <Button 
-                    type="primary"
-                    onClick={handleSubmit}
-                    loading={submitting}
-                  >
-                    {editMode ? "Update" : "Simpan"}
-                  </Button>
-                </div>
-              }
-            >
-              <Form form={form} layout="vertical">
-                <Form.Item
-                  name="title"
-                  label="Judul Video"
-                  rules={[{ required: true, message: 'Judul harus diisi' }]}
-                >
-                  <Input placeholder="Contoh: Tutorial React Dasar" />
-                </Form.Item>
-
-                <Form.Item
-                  name="url"
-                  label="URL YouTube"
-                  rules={[
-                    { required: true, message: 'URL harus diisi' }  ,
-                    { 
-                      pattern: /^(https?\:\/\/)?(www\.)?(youtube\.com|youtu\.?be)\/.+$/,
-                      message: 'URL YouTube tidak valid' 
-                    }
-                  ]}
-                >
-                  <Input placeholder="https://youtube.com/watch?v=..." />
-                </Form.Item>
-
-                <Form.Item
-                  name="description"
-                  label="Deskripsi"
-                  rules={[{ required: true, message: 'Deskripsi harus diisi' }]}
-                >
-                  <Input.TextArea rows={4} placeholder="Deskripsi video" />
-                </Form.Item>
-
-                <Form.Item
-                  name="thumbnail"
-                  label="Thumbnail URL"
-                  rules={[
-                    { 
-                      required: true, 
-                      message: 'Thumbnail wajib diisi' 
-                    },
-                    { 
-                      type: 'url', 
-                      message: 'URL tidak valid' 
-                    }
-                  ]}
-                >
-                  <Input placeholder="Masukkan URL thumbnail" />
-                </Form.Item>
-              </Form>
-            </Drawer>
-
             <Title level={2}>Playlist Lainnya</Title>
             <Text style={{ fontSize: "12pt" }}>Daftar video pembelajaran</Text>
 
+            {/* Filter genre dengan style tab */}
+            <div style={{ margin: "16px 0", textAlign: "right" }}>
+              <Button.Group>
+                <Button
+                  type={genreFilter === "song" ? "primary" : "default"}
+                  style={{
+                    borderRadius: "20px 0 0 20px",
+                    fontWeight: "bold",
+                    background: genreFilter === "song" ? "#1890ff" : "#fff",
+                    color: genreFilter === "song" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("song")}
+                >
+                  Song
+                </Button>
+                <Button
+                  type={genreFilter === "music" ? "primary" : "default"}
+                  style={{
+                    borderRadius: 0,
+                    fontWeight: "bold",
+                    background: genreFilter === "music" ? "#1890ff" : "#fff",
+                    color: genreFilter === "music" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("music")}
+                >
+                  Music
+                </Button>
+                <Button
+                  type={genreFilter === "education" ? "primary" : "default"}
+                  style={{
+                    borderRadius: 0,
+                    fontWeight: "bold",
+                    background: genreFilter === "education" ? "#1890ff" : "#fff",
+                    color: genreFilter === "education" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("education")}
+                >
+                  Educations
+                </Button>
+                    <Button
+                  type={genreFilter === "movie" ? "primary" : "default"}
+                  style={{
+                    borderRadius: 0,
+                    fontWeight: "bold",
+                    background: genreFilter === "movie" ? "#1890ff" : "#fff",
+                    color: genreFilter === "movie" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("movie")}
+                >
+                  Movie
+                </Button>
+                <Button
+                  type={genreFilter === "others" ? "primary" : "default"}
+                  style={{
+                    borderRadius: "0 20px 20px 0",
+                    fontWeight: "bold",
+                    background: genreFilter === "others" ? "#1890ff" : "#fff",
+                    color: genreFilter === "others" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("others")}
+                >
+                  Others
+                </Button>
+              </Button.Group>
+            </div>
 
             {loading ? (
               <div style={{ textAlign: 'center', padding: '24px' }}>
                 <Spin tip="Memuat data..." size="large" />
               </div>
-            ) : filteredData.length === 0 ? (
+            ) : playlistData.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '24px' }}>
                 <Text type="secondary">
-                  {searchText ? 'Tidak ditemukan hasil pencarian' : 'Belum ada data playlist'}
+                  {'Belum ada data playlist'}
                 </Text>
               </div>
             ) : (
@@ -244,7 +166,7 @@ const Others = () => {
                   lg: 3,
                   xl: 3,
                 }}
-                dataSource={filteredData}
+                dataSource={playlistData}
                 renderItem={item => (
                   <List.Item key={item.id_play}>
                     <Card
@@ -264,20 +186,6 @@ const Others = () => {
                           />
                         </a>
                       }
-                      actions={[
-                        <EditOutlined 
-                          key="edit" 
-                          onClick={() => handleEdit(item)} 
-                        />,
-                        <Popconfirm
-                          title="Hapus playlist ini?"
-                          onConfirm={() => handleDelete(item.id_play)}
-                          okText="Ya"
-                          cancelText="Tidak"
-                        >
-                          <DeleteOutlined key="delete" />
-                        </Popconfirm>
-                      ]}
                     >
                       <Card.Meta
                         title={<Text strong ellipsis>{item.play_name || 'No Title'}</Text>}

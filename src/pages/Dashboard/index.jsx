@@ -1,185 +1,206 @@
-import { Col, Row, Typography, Card, Flex, Table } from "antd";
-import Paragraph from "antd/lib/typography/Paragraph";
+import React, { useState, useEffect } from "react";
 import {
-  CoffeeOutlined,
-  IdcardOutlined,
-  ProductOutlined,
-  RightOutlined,
-  ShoppingCartOutlined,
-  TagsOutlined,
-  UnorderedListOutlined,
+  Card,
+  Button,
+  Typography,
+  Row,
+  Col,
+  Popconfirm,
+  notification,
+  Input,
+  FloatButton,
+  Form,
+  List,
+  Spin,
+  Drawer
+} from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  PlusCircleOutlined,
+  SearchOutlined,
 } from "@ant-design/icons";
-import { Divider } from "antd/lib";
-import EChart from "../../components/chart/Echart";
-import { formatCurrency } from "../../utils/math";
+import { getData, sendData, deleteData } from "../../utils/api";
+
 const { Title, Text } = Typography;
 
-const dataSource = [
-  {
-    key: "Jan",
-    months: "Jan",
-    orders: 1200,
-    total_income: 1200000,
-  },
-  {
-    key: "Feb",
-    months: "Feb",
-    orders: 3000,
-    total_income: 1000000,
-  },
-  {
-    key: "Mar",
-    months: "Mar",
-    orders: 5000,
-    total_income: 5000000,
-  },
-  {
-    key: "Apr",
-    months: "Apr",
-    orders: 3000,
-    total_income: 1000000,
-  },
-  {
-    key: "May",
-    months: "May",
-    orders: 3000,
-    total_income: 3000000,
-  },
-  {
-    key: "June",
-    months: "June",
-    orders: 5000,
-    total_income: 5000000,
-  },
-];
+const Dashboard = () => {
+  const [playlistData, setPlaylistData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
+  const [genreFilter, setGenreFilter] = useState("all"); // Tambah state filter
 
-const columns = [
-  {
-    title: "Month",
-    dataIndex: "months",
-    key: "months",
-  },
-  {
-    title: "Orders",
-    dataIndex: "orders",
-    key: "orders",
-    render: (value, record) => formatCurrency(record?.orders),
-  },
-  {
-    title: "Total Income.",
-    dataIndex: "total_income",
-    key: "total_income",
-    render: (value, record) => formatCurrency(record?.total_income),
-  },
-];
+  const filteredData = genreFilter === "all"
+    ? playlistData
+    : playlistData.filter(item => item.play_genre === genreFilter);
 
-function Dashboard() {
-  const cardDashboard = (icon, label, value) => {
-    return (
-      <div>
-        <Flex align="center">
-          <div style={{ marginRight: "15px" }}>{icon}</div>
-          <div>
-            <Title level={1} type={"primary"} style={{ marginBottom: 0 }}>
-              {value}
-            </Title>
-            <Text type="secondary">{label}</Text>
-          </div>
-        </Flex>
-      </div>
-    );
+  useEffect(() => {
+    fetchPlaylistData();
+  }, []);
+
+  const fetchPlaylistData = () => {
+    setLoading(true);
+    getData("/api/playlist/45")
+      .then((response) => {
+        if (response && Array.isArray(response.datas)) {
+          setPlaylistData(response.datas);
+        } else {
+          showAlert("error", "Error", "No data available");
+          setPlaylistData([]);
+        }
+      })
+      .catch(() => {
+        showAlert("error", "Error", "Failed to load playlist data");
+      })
+      .finally(() => setLoading(false));
   };
+
+  const showAlert = (status, title, description) => {
+    api[status]({
+      message: title,
+      description: description,
+    });
+  };
+
   return (
     <div className="layout-content">
+      {contextHolder}
       <Row gutter={[24, 0]}>
-        <Col xs={24} md={12} sm={24} lg={12} xl={12} className="mb-24">
-          <Card bordered={false} className="criclebox h-full">
-            <Flex justify="flex-start">
-              {cardDashboard(
-                <UnorderedListOutlined
-                  style={{ fontSize: "64px", color: "#47c363" }}
-                />,
-                "Categories",
-                3,
-              )}
-              <div style={{ marginRight: "150px" }}></div>
-              {cardDashboard(
-                <IdcardOutlined
-                  style={{ fontSize: "64px", color: "#fc544b" }}
-                />,
-                "Members",
-                24,
-              )}
-            </Flex>
-            <Divider />
-            <Flex justify="flex-start">
-              {cardDashboard(
-                <ShoppingCartOutlined
-                  style={{ fontSize: "64px", color: "#6777ef" }}
-                />,
-                "Orders",
-                120,
-              )}
-              <div style={{ marginRight: "150px" }}></div>
-              {cardDashboard(
-                <ProductOutlined
-                  style={{ fontSize: "64px", color: "#3abaf4" }}
-                />,
-                "Products",
-                24,
-              )}
-            </Flex>
-            <Divider />
-            <Flex justify="flex-start">
-              {cardDashboard(
-                <TagsOutlined style={{ fontSize: "64px", color: "#ffa426" }} />,
-                "Discounts",
-                120,
-              )}
-              <div style={{ marginRight: "150px" }}></div>
-              {cardDashboard(
-                <CoffeeOutlined style={{ fontSize: "64px", color: "#000" }} />,
-                "Charges",
-                24,
-              )}
-            </Flex>
-            <Divider />
-            <div className="h-full col-content p-20">
-              <div className="ant-muse">
-                <Text>Built by SIFORS dev. teams</Text>
-                <Title level={5}>
-                  Content Management Systems by WebfmSI.com
-                </Title>
-                <Paragraph className="lastweek mb-36">
-                  See the progress graph from your store.
-                </Paragraph>
-              </div>
-              <div className="card-footer">
-                <a className="icon-move-right" href="/finance" target="_blank">
-                  Also you able to see the Finance Reporting
-                  {<RightOutlined />}
-                </a>
-              </div>
+        <Col xs={24}>
+          <Card bordered={false} className="circlebox h-full w-full">
+            <Title level={2}>Playlist Saya</Title>
+            <Text style={{ fontSize: "12pt" }}>Daftar video playlist saya</Text>
+
+            {/* Filter genre dengan style tab */}
+            <div style={{ margin: "16px 0", textAlign: "right" }}>
+              <Button.Group>
+                <Button
+                  type={genreFilter === "song" ? "primary" : "default"}
+                  style={{
+                    borderRadius: "20px 0 0 20px",
+                    fontWeight: "bold",
+                    background: genreFilter === "song" ? "#1890ff" : "#fff",
+                    color: genreFilter === "song" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("song")}
+                >
+                  Song
+                </Button>
+                <Button
+                  type={genreFilter === "music" ? "primary" : "default"}
+                  style={{
+                    borderRadius: 0,
+                    fontWeight: "bold",
+                    background: genreFilter === "music" ? "#1890ff" : "#fff",
+                    color: genreFilter === "music" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("music")}
+                >
+                  Music
+                </Button>
+                <Button
+                  type={genreFilter === "education" ? "primary" : "default"}
+                  style={{
+                    borderRadius: 0,
+                    fontWeight: "bold",
+                    background: genreFilter === "education" ? "#1890ff" : "#fff",
+                    color: genreFilter === "education" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("education")}
+                >
+                  Educations
+                </Button>
+                    <Button
+                  type={genreFilter === "movie" ? "primary" : "default"}
+                  style={{
+                    borderRadius: 0,
+                    fontWeight: "bold",
+                    background: genreFilter === "movie" ? "#1890ff" : "#fff",
+                    color: genreFilter === "movie" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("movie")}
+                >
+                  Movie
+                </Button>
+                <Button
+                  type={genreFilter === "others" ? "primary" : "default"}
+                  style={{
+                    borderRadius: "0 20px 20px 0",
+                    fontWeight: "bold",
+                    background: genreFilter === "others" ? "#1890ff" : "#fff",
+                    color: genreFilter === "others" ? "#fff" : "#1890ff",
+                    borderColor: "#1890ff"
+                  }}
+                  onClick={() => setGenreFilter("others")}
+                >
+                  Others
+                </Button>
+              </Button.Group>
             </div>
-          </Card>
-        </Col>
-        <Col xs={24} md={12} sm={24} lg={12} xl={12} className="mb-24">
-          <Card bordered={false} className="criclebox h-full">
-            <EChart />
-            <Divider />
-            <Table
-              size="small"
-              dataSource={dataSource}
-              columns={columns}
-              pagination={{
-                pageSize: 3,
-              }}
-            />
+
+            {loading ? (
+              <div style={{ textAlign: 'center', padding: '24px' }}>
+                <Spin tip="Memuat data..." size="large" />
+              </div>
+            ) : filteredData.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '24px' }}>
+                <Text type="secondary">
+                  {'Belum ada data playlist'}
+                </Text>
+              </div>
+            ) : (
+              <List
+                grid={{
+                  gutter: 16,
+                  xs: 1,
+                  sm: 2,
+                  md: 3,
+                  lg: 3,
+                  xl: 3,
+                }}
+                dataSource={filteredData}
+                renderItem={item => (
+                  <List.Item key={item.id_play}>
+                    <Card
+                      hoverable
+                      cover={
+                        <a href={item.play_url} target="_blank" rel="noopener noreferrer">
+                          <img
+                            alt="thumbnail"
+                            src={item.play_thumbnail || 'https://via.placeholder.com/300x200?text=No+Thumbnail'}
+                            style={{ 
+                              height: '200px', 
+                              objectFit: 'fill',
+                              borderTopRightRadius: '10px',
+                              borderTopLeftRadius: '10px',
+                              width: '100%'
+                            }}
+                          />
+                        </a>
+                      }
+                    >
+                      <Card.Meta
+                        title={<Text strong ellipsis>{item.play_name || 'No Title'}</Text>}
+                        description={
+                          <Text ellipsis>
+                            {item.play_description || 'No description available'}
+                          </Text>
+                        }
+                      />
+                    </Card>
+                  </List.Item>
+                )}
+              />
+            )}
           </Card>
         </Col>
       </Row>
     </div>
   );
-}
+};
 
 export default Dashboard;

@@ -12,6 +12,7 @@ import Blank from "./pages/Blank";
 import Others from "./pages/Others/others";
 import Educations from "./pages/Educations/educations";
 
+
 function App() {
   return (
     <div className="App">
@@ -22,11 +23,6 @@ function App() {
           exact
           path="/dashboard"
           element={<PrivateRoute component={<Dashboard />} />}
-        />
-        <Route
-          exact
-          path="/others"
-          element={<PrivateRoute component={<Others />} />}
         />
         <Route
           exact
@@ -52,6 +48,11 @@ function App() {
           exact
           path="/profile"
           element={<PrivateRoute component={<Blank />} />}
+        />
+        <Route
+          exact
+          path="/others"
+          element={<PrivateRoute component={<Others />} />}
         />
       </Routes>
     </div>
