@@ -109,21 +109,6 @@ function Sidenav({ color }) {
         </NavLink>
       ),
     },
-    {
-      label: (
-        <NavLink to="/gallery">
-          <span
-            className="icon"
-            style={{
-              backgroundColor: selectedKey === "gallery" ? "#f0f2f5" : "",
-            }}
-          >
-            <FileImageOutlined />
-          </span>
-          <span className="label">Galeri</span>
-        </NavLink>
-      ),
-    },
         {
       label: (
         <NavLink to="/movie">

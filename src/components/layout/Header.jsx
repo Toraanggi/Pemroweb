@@ -69,7 +69,7 @@ function Header({
   handleFixedNavbar,
 }) {
   const { Title, Text } = Typography;
-
+  const [playlistData, setPlaylistData] = useState([]);
   const [visible, setVisible] = useState(false);
   const [sidenavType, setSidenavType] = useState("transparent");
   const [searchText, setSearchText] = useState("");
@@ -88,9 +88,14 @@ function Header({
     navigate("/login", { replace: true });
   };
 
-  const handleSearch = (search) => {
-    setSearchText(search.toLowerCase());
-  };
+
+  useEffect(() => {
+    const filtered = playlistData.filter(item =>
+      item.play_name.toLowerCase().includes(searchText.toLowerCase()) ||
+      item.play_description.toLowerCase().includes(searchText.toLowerCase())
+    );
+    setFilteredData(filtered);
+  }, [searchText, playlistData]);
 
   return (
     <>
@@ -101,7 +106,7 @@ function Header({
         className="Header Search"
         allowClear
         size="middle"
-        onChange={(e) => handleSearch(e.target.value)}
+        onChange={(e) => setSearchText(e.target.value)}
       />
       <Row gutter={[24, 0]}>
         <Col span={24} md={8}>
