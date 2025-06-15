@@ -413,6 +413,7 @@ body {
 	flex-direction: row-reverse;
 	align-items: center;
 	margin-top: 10px;
+	
   }
   
   .ant-dropdown-menu.ant-dropdown-menu-split.header-notifications-dropdown {
@@ -3046,3 +3047,16 @@ body {
 	path {
 	fill: #8c8c8c;
   }
+.Header.Search {
+  width: 650px;
+  height: 40px;         
+  font-size: 15px;
+  margin-left: auto;
+  margin-right: auto;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;     
+  box-sizing: border-box;
+}
+
