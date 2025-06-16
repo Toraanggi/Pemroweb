@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Typography, Row, Col, notification, Spin, Avatar, Tag } from 'antd';
-// PENYESUAIAN: Impor ikon CheckOutlined untuk menandakan sudah ditambahkan
 import { PlusOutlined, UserOutlined, CheckOutlined } from '@ant-design/icons';
 
 const { Title, Paragraph, Text } = Typography;
@@ -86,9 +85,6 @@ const Community = () => {
   const [playlists, setPlaylists] = useState([]);
   const [loadingPage, setLoadingPage] = useState(true);
   const [addingId, setAddingId] = useState(null);
-  
-  // PENYESUAIAN 1: State baru untuk melacak playlist yang sudah ditambahkan
-  // Menggunakan Set lebih efisien untuk pengecekan data.
   const [addedPlaylistIds, setAddedPlaylistIds] = useState(new Set());
 
   const [notificationApi, contextHolder] = notification.useNotification();
@@ -111,10 +107,9 @@ const Community = () => {
         placement: 'topRight',
       });
 
-      // PENYESUAIAN 2: Update state `addedPlaylistIds` setelah simulasi berhasil
       setAddedPlaylistIds(prevIds => new Set(prevIds).add(playlist.id));
 
-      setAddingId(null); // Hentikan loading pada tombol
+      setAddingId(null); 
     }, 2000);
   };
 
@@ -130,9 +125,9 @@ const Community = () => {
         <Row gutter={[24, 24]} style={{ marginTop: '24px' }}>
           {playlists.map((item) => {
             
-            // PENYESUAIAN 3: Logika kondisional untuk mengubah tampilan tombol
-            const isAdded = addedPlaylistIds.has(item.id);
-            const isLoading = addingId === item.id;
+            // Logika kondisional untuk mengubah tampilan tombol
+            const isAdded = addedPlaylistIds.has(item.id); 
+            const isLoading = addingId === item.id; 
             const isButtonDisabled = isAdded || (addingId !== null && addingId !== item.id);
 
             return (
@@ -147,7 +142,6 @@ const Community = () => {
                       onClick={() => !isAdded && handleAddToMyPlaylist(item)}
                       loading={isLoading}
                       disabled={isButtonDisabled}
-                      // Tambahkan style untuk tombol yang sudah ditambahkan agar terlihat berbeda
                       style={isAdded ? { borderColor: '#52c41a', color: '#52c41a', cursor: 'default' } : {}}
                     >
                       {isLoading ? 'Menambahkan...' : (isAdded ? 'Telah Ditambahkan' : 'Tambah ke Saya')}

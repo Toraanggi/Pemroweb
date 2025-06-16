@@ -245,7 +245,7 @@ const Dashboard = () => {
               </Form>
             </Drawer>
 
-            <Title level={2}>Playlist Edukasi</Title>
+            <Title level={2}>Daftar Playlist</Title>
             <Text style={{ fontSize: "12pt" }}>Daftar video pembelajaran</Text>
 
             <Input
